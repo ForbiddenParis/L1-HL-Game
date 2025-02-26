@@ -151,8 +151,7 @@ while rounds_played < num_rounds:
     already_guessed = []
 
     # choose a 'secret' number between the low and high number
-    # secret = random.randint(low_num, high_num)
-    secret = 7
+    secret = random.randint(low_num, high_num)
 
     guess = ""
     while guess != secret and guesses_used < guesses_allowed:
