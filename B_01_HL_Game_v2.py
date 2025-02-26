@@ -6,7 +6,6 @@ import random
 def yes_no(question):
     """Checks user response to a question is yes / no (y/n). returns 'yes' or 'no' """
     while True:
-
         response = input(question).lower()
 
         # check if the user says yes/no/y/n
@@ -15,7 +14,7 @@ def yes_no(question):
         elif response == "no" or response == "n":
             return "no"
         else:
-            print("please enter yes/no")
+            print("Please enter yes/no")
 
 
 def instructions():
@@ -27,10 +26,11 @@ To begin, choose the number of rounds and either customise
 the game parameters or go with the default game (where the
 secret number with be between 1 and 100).
 
-Then choose how many rounds you'd like to play <enter> for 
+Then choose how many rounds you'd like to play. <enter> for 
 infinite mode.
 
 Your goal is to try to guess the secret number without running out of guesses.
+Or press "xxx" to quit.
 
 Good luck.
 
@@ -75,7 +75,8 @@ def int_check(question, low=None, high=None, exit_code=None):
                 print(error)
 
             # if response is valid, return it
-            return response
+            else:
+                return response
 
         except ValueError:
             print(error)
@@ -112,21 +113,22 @@ if want_instructions == "yes":
     instructions()
 
 # Ask user for number of rounds / infinite mode
-num_rounds = int_check("Rounds <enter for infinite>: ", low=1, exit_code="")
+num_rounds = int_check("Rounds <enter for infinite>: ",
+                       low=1, exit_code="")
 
-if num_rounds == "infinite":
+if num_rounds == "":
     mode = "infinite"
     num_rounds = 5
 
 # ask the user if they want to customise the number range
-default_params = yes_no("Do you want to use the default game parameters")
+default_params = yes_no("Do you want to use the default game parameters: ")
 if default_params == "yes":
-    low_num = 0
+    low_num = 1
     high_num = 10
 
 # allow user to choose the high / low number
 else:
-    low_num = int_check("Low Number? ")
+    low_num = int_check("Low Number? ", low=1)
     high_num = int_check("High Number? ", low=low_num + 1)
 
 # calculate the maximum number of guesses based on the low and high number
@@ -149,15 +151,15 @@ while rounds_played < num_rounds:
     already_guessed = []
 
     # choose a 'secret' number between the low and high number
-    secret = random.randint(low_num, high_num)
-    print("Spoiler Alert", secret)
-    # remove this line after testing!
+    # secret = random.randint(low_num, high_num)
+    secret = 7
 
     guess = ""
     while guess != secret and guesses_used < guesses_allowed:
 
         # ask user to guess the number
-        guess = int_check("Guess: ", low=0, high=10, exit_code="xxx")
+        # print(secret)
+        guess = int_check("Guess: ", low_num, high_num, "xxx")
 
         # check that they don't want to quit
         if guess == "xxx":
@@ -220,8 +222,37 @@ while rounds_played < num_rounds:
 
     rounds_played += 1
 
+    # Add round result to game history
+    history_feedback = f"Round {rounds_played}: {feedback}"
+    game_history.append(history_feedback)
+
+    # add guesses used to score list
+    all_scores.append(guesses_used)
+
     # if users are in infinite mode, increase number of rounds!
     if mode == "infinite":
         num_rounds += 1
 
-# Game history / statistics area
+if rounds_played > 0:
+    # Game History / Statistics area
+
+    # Calculate statistics
+    all_scores.sort()
+    best_score = all_scores[0]
+    worst_score = all_scores[-1]
+    average_score = sum(all_scores) / len(all_scores)
+
+    # Output the statistics
+    print("\n📊📊📊 Statistics 📊📊📊")
+    print(f"Best:{best_score} | Worst:{worst_score} | Average:{average_score:.2f} ")
+    print()
+
+    # Display the game history on request
+    see_history = yes_no("Do you want to see your game history? ")
+    if see_history == "yes":
+        for item in game_history:
+            print(item)
+
+# if users have quit without playing a round, end the program
+else:
+    print("🐔🐔🐔 Oops - you chickened out and did not play any rounds. 🐔🐔🐔")
